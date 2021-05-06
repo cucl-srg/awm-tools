@@ -1,0 +1,89 @@
+Automatic Network Traffic Classification (ANTc)
+----------------------------------------
+
+First Steps:
+
+	FOLLOW THE INSTRUCTIONS IN: INSTALL
+
+Initialisation:
+
+	Generate some attributes for the test data
+	------------------------------------------
+	Use the attribute generator program to produce an ARFF file containing
+	all the attributes for each connection (flow) in your test data set.
+
+	- e.g: ./attributegenerator/bin/awmreduced myData -a myAttributes.arff
+	- Remember to set LD_LIBRARY_PATH to: ./attributegenerator/lib/
+	- Read manual entries:
+		- attributegenerator
+		- awmreduced
+
+	Hand classify some test data
+	----------------------------
+	Go through the arff file from above and enter a class value for each
+	entry. The class value is the last "?" on each line.
+	For each class that you enter (e.g. WWW, MAIL, FTP) you need to also
+	alter the CLASS attribute header at the top of the arff file.
+
+	- e.g @attribute CLASS { WWW MAIL FTP GAMES TELNET CHAT }
+
+	This hand classification process is an important step as it is the class
+	values that you enter here that area going to shape the model output
+	from the WEKA package. Therefore, it is important that all entries are
+	correctly entered. This may take a long time to complete!
+
+	Generate a classification model
+	-------------------------------
+	The final step to initialise your own classification engine is to 
+	generate a model file containing the statistical distributions of each
+	attribute value for each class. In the example provided here, we have 
+	used the NaiveBayes classifier from the WEKA package. To create a model
+	file we simply use the command:
+
+	- java weka.classifiers.bayes.NaiveBayes -t myAttributes.arff -d myModel
+
+	This command creates a model based upon the file given after the -t 
+	option and outputs it to the file given after the -d option. As well as
+	this, statistics about the model produces are also output to the terminal.
+	It may be useful to capture this information as WEKA automatically
+	performs testing on the input data to provide a accuracy value of how
+	good the model is at classifying the data that created it. i.e. given
+	the original training data, does the model still classify each flow
+	correctly
+
+Classification:
+
+	Generate some attribute data 
+	----------------------------
+
+	Using the same process as before, we can generate a set of attributes
+	for any set of network traffic (or even off a live network interface!)
+
+	- ./attributegenerator/bin/awmreduced input.data -a input.arff
+	
+
+	Classify the input data
+	-----------------------
+
+	Using the model file created in the initialisation steps we can now 
+	classify unknown data using WEKA.
+
+	You need to ensure that the file's class header matches exactly the same        as the class header of the file that created the original model.
+
+	- java weka.classifiers.bayes.NaiveBayes -T input.arff -l myModel	
+
+	This will now output statistical data on the input arff file giving
+	accuracies, confusion matrices and other useful data to allow you to
+	determine how successful your classification scheme is.
+
+	WEKA has many other options and a GUI that can be used to run experiments
+	on input arff data and is well worth checking out.
+	
+In Addition:
+
+	HOWTO_GENERATE_YOUR_OWN_ATTRIBUTES
+	----------------------------------
+	A guide to creating your own attribute sets is provided in the docs folder
+	This guide describes how to build your own attribute generator so that
+	you can decide which attributes are used in the classification of data.
+

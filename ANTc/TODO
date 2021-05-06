@@ -1,0 +1,37 @@
+Demultiplexing
+--------------
+- Defragment fragmented IP packets
+	- Only 5 found in 13474 flows, therefore, we assume
+	that they are from a broken link in this release
+	However, we might have to investigate it.
+
+No need to do (Kaysar Abdin)
+
+
+Attribute Queries
+-----------------
+
+Should we drop retrans packets? They interfere with certain attributes
+Although, they could be a contributing function to the 95% accuracy quoted
+by awm. Is that the best solution? Should we only consider the packets that
+were actually used in the flow?
+
+(We should not discard retrans pkts - Kaysar Abdin)
+
+
+
+
+Models
+-------
+
+Models to generate:
+
+	- Kernel Density Only
+	- Entire Data Set for All Attributes
+	- Entire Data Set for awmreduced
+	- Entire Data Set for portnumber
+
+(Models have been built, should be located under weka-models dir 
+ Kaysar Abdin)
+
+

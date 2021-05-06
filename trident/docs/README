@@ -1,0 +1,181 @@
+/******************************************************************************
+*                                                                             *
+*   Copyright 2006 Queen Mary University of London                            *
+*   Copyright 2005 University of Cambridge Computer Laboratory.               *
+*                                                                             *
+*                                                                             *
+*   This file is part of Trident.                                             *
+*                                                                             *
+*   Trident is free software; you can redistribute it and/or modify           *
+*   it under the terms of the GNU General Public License as published by      *
+*   the Free Software Foundation; either version 2 of the License, or         *
+*   (at your option) any later version.                                       *
+*                                                                             *
+*   Trident is distributed in the hope that it will be useful,                *
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of            *
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             *
+*   GNU General Public License for more details.                              *
+*                                                                             *
+*   You should have received a copy of the GNU General Public License         *
+*   along with Trident; if not, write to the Free Software                    *
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA *
+*                                                                             *
+******************************************************************************/
+******************************************************************************/
+*                                                                             *
+*                             HISTORY                                         *
+*                                                                             *
+* Trident is based upon nttcp - written by Andrew W. Moore in about 1999      *
+* nttcp is based upon pttcp - written by Ian Pratt in about 1998              *
+* pttcp is based upon ttcp  - written by many among whom Mike Muuss           *
+*                             stands tallest from about 1984                  *
+*                                                                             *
+******************************************************************************/
+
+
+Installation:
+************
+1.	untar the tgz ball 
+2.	execute the make command
+3. 	run trident using the following usage information: ./bin/trident <Usage>
+
+Usage:
+******
+Server:      [svr] -s 
+Client:	     [clt] -c <server> [-n <conns>] [-b <bytes>]
+	     
+Receiver:    [rxr] -r
+Transmitter: [txr] -t <receiver> [-n <conns>] [-b <bytes>]
+	     
+Surge Client:
+	     [surge_clt] -C <server> [-n <conns>]
+		"        [--<objsize|interobj|objperpage|interpage>
+		"         <constant <value>|exponent <mean>|pareto <mean> <shape
+
+commands valid for all generators:
+
+	     [-D <scaling> (of timers)]
+	     [-T <runtime>]
+	     [-B <port base>]
+	     [-N <number of ports>]
+	     [-R <random number seed>]
+
+Example usuage:
+**************
+
+1. Firstly start a receiver on a remote host:
+
+	./bin/trident -r 
+
+2. Now start a transmitter on another remote host:
+
+	./bin/trident -t <IPAddress>  -n 1000 -b 1024
+
+Distribution Usage: (-d)
+*******************
+The trident software includes a distribution file mode which will read in a file that contains file sizes and the their relevant probabilities. An example file is provided in the example folder. 
+
+You must ensure that the file sizes are in numerical order and their subsequent probabilities sum to 1.
+
+Simply provide trident with the input file:
+
+	./bin/trident -d example/input.txt
+
+An output file is produced named table.txt. This contains the result of my random generator which samples my distribution.
+
+Surge Client Info:
+*****************
+
+Surge client communicates with the server mode of trident
+
+The objective is to partially replicate the behaviour of the 
+SURGE web-server tester of 
+
+P. Barford and M.E. Crovella, "Generating representative wb workloads
+for network and server performance evaluation", In Proceedings of
+Performance '98/ ACM Sigmetrics '98 pages 151-160, 1998
+
+as used in 
+
+Feldman A., et.al, "Dynamics of IP Traffic: A study of the role of 
+variability and the impact of control", SIGCOMM'99, pp 301-313.
+
+
+PERSISTANT (V1.1 HTTP) connections are assumed, to simulate HTTP V1.0
+use a constant objperpage of 1 interobj of 0 and a
+.different. interpage distribution.
+
+This client is easiest thought of as a four stage Marokv chain.
+
+the four stages are
+
+
+--interpage: time between consequtive pages downloaded in one
+session
+
+--objperpage: number of objects within a web page; all such objects
+are retrieved from the server before waiting for another page.
+
+--interobj: time between retriving each object on a single page.
+
+--objsize: size of an object in >BYTES<
+
+each option above takes a distribution and the distribution
+arguments....
+
+constant <constant>
+exponent <mean>
+pareto <mean> <shape>
+
+allowing you to specify a moderatly complex Markox chain with differing
+distributions and differing probabilities for each transtion stage.
+
+the sessions, once running are assumed to contain an `infinite' number
+of pages, (or until the runtime is complete.)
+
+Currently it does not calculate 
+inter-session time
+nor
+pages-per-session
+
+As these are considered the responsibility of a test-rig (and can be set
+as the run_time, etc.)
+
+A poor effort is made to distribute the various `clients' over the
+estimated lifetime of a connection so as to not have them all start
+at once
+
+5 examples were used in the Feldman paper, these and their respective
+parameter sets are given below.
+
+Pareto 1 :
+--interpage pareto 50 2 \
+--objperpage pareto 4 1.2 \
+--interobj pareto 0.5 1.5 \
+--objsize pareto 12000 1.2
+
+Pareto 2 :
+--interpage pareto 10 2 \
+--objperpage pareto 3 1.5 \
+--interobj pareto 0.5 1.5 \
+--objsize pareto 12000 1.2
+
+Exp 1    :
+--interpage pareto 25 2 \
+--objperpage constant 1 \
+--interobj constant 0 \
+--objsize exponent 12000
+
+Exp 2    :
+--interpage exponent 10 \
+--objperpage constant 1 \
+--interobj constant 0 \
+--objsize exponent 12000
+
+Constant :
+--interpage constant 10 \
+--objperpage constant 1 \
+--interobj constant 0 \
+--objsize constant 1e6
+
+used without additional options, the "Constant" type is the default.

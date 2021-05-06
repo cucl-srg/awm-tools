@@ -1,0 +1,245 @@
+Idiots Guide to ANTc
+--------------------
+
+Welcome to the comprehensive guide for using our ANTc program. Firstly 
+to start of we need to perform a few commands so that ANTc is able to 
+run on your system.This includes setting the library path and the class 
+path which are later used when using ANTc to create output files and models.
+
+The following two commands may be incorporated into a script thus running 
+the script would enable ANTc to run without the need to continually typing 
+the commands.
+
+NOTE:
+        The following instructions are known to work on Fedora Core         
+        operating system.
+
+Installing WEKA
+---------------
+There are several options available; i myself prefer to use lynx via a 
+terminal whilst in ANTc root directory:
+
+lynx http://www.cs.waikato.ac.nz/ml/weka/
+
+and then follow the option to download the latest version of weka for linux. 
+A weka.zip file is given which you should unzip. You now need to create a 
+jar package:
+
+mv weka-3../weka.jar ./
+
+You can now remove the weka folder and zip file as you now have the jar 
+executable.
+
+Setting the Library Path
+------------------------
+
+export LD_LIBRARY_PATH=./attributegenerator/lib/
+
+This commands needs to be executed using a terminal whilst ontop of the 
+ANTc folder.
+
+Setting the Class Path for Weka
+-------------------------------
+
+export CLASSPATH=.:./weka.jar
+
+This command need to be executed using a terminal whilst ontop of the 
+ANTc folder.
+
+-------------------------------------------------------------------------------
+Now that we have setup the library path and the class path, we are ready
+to use ANTc.
+
+ANTc is provided with example output files which can be used to build 
+models and these subsequent models can be used to verify further flows.
+
+Here is an example usage instructions for ANTc:
+
+Firstly we need to create an output ARFF file which will be later used 
+to create the model:
+
+./attributegenerator/bin/portnumber ./example/example_test.tcpdump 
+						-a test_port.arff -e tcp
+
+Here we using the attribute generator: portnumber, the packets from the 
+file: example_test.tcpdump and the filter expression: tcp. The filter 
+expression makes sure that only tcp packets are allowed into the classifier. 
+This is not strictly necessary as the application will reject these packets, 
+however, may speed things up if filtering is done at the packet capture/read 
+level than higher up in the demultiplexing level.
+
+This creates an output file named test_port.arff. By viewing the contents 
+of this file you can see that the portnumber attribute generator has created 
+a file which can now be used to create a model.
+
+Some useful commands:
+
+-a <string>     // ARFF File to output results to
+-d <int>        // Classify after a certain duration (OPTIONAL)
+-p <int>        // Classify after a certain flow length (OPTIONAL)
+-t <int>        // Time out value for idle flows (OPTIONAL)
+-v      	// Prints to display instead of a file
+-e <string>     // Filter expression. (For example -e "tcp")
+		// which filters out all traffic except tcp packets
+
+OUTPUT FOR: test_port.arff
+--------------------------------------------------------------------------------% OUTPUT FROM ONLYPORTNUMBER ATTRIBUTES
+@relation ONLY_PORT_NUMBER
+@attribute SOURCE_PORT numeric
+@attribute DESTINATION_PORT numeric
+@attribute CLASS { ENTER YOUR CLASS NAMES HERE }
+@data
+33686,389,?    % 6/10.212.4.181/33686/10.212.4.52/00389/1155557483.481514
+33687,389,?    % 6/10.212.4.181/33687/10.212.4.52/00389/1155557483.481789
+22,53202,?    % 6/10.212.4.181/00022/10.212.4.254/53202/1155557483.481351/MIDSTREAM/INCOMPLETE
+33688,389,?    % 6/10.212.4.181/33688/10.212.4.52/00389/1155557503.920354
+33689,389,?    % 6/10.212.4.181/33689/10.212.4.52/00389/1155557503.932960
+33690,389,?    % 6/10.212.4.181/33690/10.212.4.52/00389/1155557504.013905
+33691,389,?    % 6/10.212.4.181/33691/10.212.4.52/00389/1155557504.024279
+33692,80,?    % 6/10.212.4.181/33692/66.102.9.147/00080/1155557514.559069
+33693,80,?    % 6/10.212.4.181/33693/66.102.9.104/00080/1155557524.343525
+33694,21,?    % 6/10.212.4.181/33694/213.171.193.5/00021/1155557540.538532/INCOMPLETE
+36526,22,?    % 6/10.212.4.254/36526/10.212.4.181/00022/1155557496.964787/INCOMPLETE
+--------------------------------------------------------------------------------
+
+The port number attribute generator  has sorted the packets into flows 
+and then generated a set of attributes (in this case a source and 
+destination port number) for each flow. The next stage is to hand 
+classify this output file and replace all the question marks with 
+class names. Any class names can be used here, however, it is important 
+to make sure that any classes assigned to each flow (line in the file) 
+are also added to the @attribute CLASS { } line. If they are omitted, 
+WEKA will return various exceptions when attempting to create/test models 
+using this file.
+
+Here is an example:
+
+--------------------------------------------------------------------------------% OUTPUT FROM ONLYPORTNUMBER ATTRIBUTES
+@relation ONLY_PORT_NUMBER
+@attribute SOURCE_PORT numeric
+@attribute DESTINATION_PORT numeric
+@attribute CLASS { UNKNOWN WEB }
+@data
+33686,389,UNKNOWN    % 6/10.212.4.181/33686/10.212.4.52/00389/1155557483.481514
+33687,389,UNKNOWN    % 6/10.212.4.181/33687/10.212.4.52/00389/1155557483.481789
+22,53202,UNKNOWN    % 6/10.212.4.181/00022/10.212.4.254/53202/1155557483.481351/MIDSTREAM/INCOMPLETE
+33688,389,UNKNOWN    % 6/10.212.4.181/33688/10.212.4.52/00389/1155557503.920354
+33689,389,UNKNOWN    % 6/10.212.4.181/33689/10.212.4.52/00389/1155557503.932960
+33690,389,UNKNOWN    % 6/10.212.4.181/33690/10.212.4.52/00389/1155557504.013905
+33691,389,UNKNOWN    % 6/10.212.4.181/33691/10.212.4.52/00389/1155557504.024279
+33692,80,WEB    % 6/10.212.4.181/33692/66.102.9.147/00080/1155557514.559069
+33693,80,WEB    % 6/10.212.4.181/33693/66.102.9.104/00080/1155557524.343525
+33694,21,UNKNOWN    % 6/10.212.4.181/33694/213.171.193.5/00021/1155557540.538532/INCOMPLETE
+36526,22,UNKNOWN    % 6/10.212.4.254/36526/10.212.4.181/00022/1155557496.964787/INCOMPLETE
+--------------------------------------------------------------------------------
+
+Using this hand classified output file we use the weka tool to create 
+a Naive Bayes model:
+
+java weka.classifiers.bayes.NaiveBayes -K -t test_port.arff -d test.model
+
+Here the weka tool using the test_port.arff file given creates and trains 
+a model called test.model.
+
+-t <name of training file>
+        Sets training file.
+-T <name of test file>
+        Sets test file. If missing, a cross-validation will be performed 
+	on the training data.
+-l <name of input file>
+        Sets model input file.
+-d <name of output file>
+	Sets model output file.
+-p<attribute range>
+        Only outputs predictions for test instances, along with attributes 
+	(0 for none).
+
+Options specific to weka.classifiers.bayes.NaiveBayes:
+-K
+	 Use kernel density estimator rather than normal
+         distribution for numeric attributes
+
+Therefore we could ommit the -K thus using the Gaussian method for building 
+the model.
+
+Now that we have the model we can use this model to classify any further 
+flows. Simply by using the same process as above we create another file. 
+We then edit this file so that its class header matches those of the 
+original file that created the model. Now we are good to go:
+
+java weka.classifiers.bayes.NaiveBayes -l test.model -T test_port.arff -p 0
+
+The weka tool takes the given model and then classifies the given test file 
+against this model. 
+
+You may be interested to know that you can avoid creating a model and 
+therefore directly classify the output file using the following command:
+
+java weka.classifiers.bayes.NaiveBayes -t test_port.arff  -T output_port.arff
+
+where:
+
+the test_port.arff file is the one we hand classified and the 
+output_port.arff files is the the one we want the weka tool to classify.
+
+
+-------------------------------------------------------------------------------
+AWMREDUCED Attributes Generator
+-------------------------------
+
+Instead of using the port number attribute generator we have the other 
+option of deploying the awmreduced attribute generator. This can be 
+simply done by replacing within the above commands all occurrences of 
+portnumber with awmreduced.
+
+Here is an example and also an overview of the whole process:>
+
+1: Create the output arff file:
+
+./attributegenerator/bin/awmreduced ./example/example_test.tcpdump 
+						-a output.arff -e "tcp"
+2: Hand Classify the output file
+
+ vi output.arff
+
+3: Create a model using the weka tool
+
+java weka.classifiers.bayes.NaiveBayes -K -t output.arff -d awm.model
+
+4. Create another output arff file to test the model:
+
+./attributegenerator/bin/awmreduced ./example/example.tcpdump -a test.arff
+
+5. Edit the file so that the class header matches those in output.arff
+
+@attribute CLASS {UNKNOWN WEB TELNET}
+
+6. Now load the model and classify test.arff:
+
+java weka.classifiers.bayes.NaiveBayes -l awm.model -T input.arff -p 0
+-------------------------------------------------------------------------------
+Create Your Own Attrubute
+-------------------------
+
+You can amend the portnumber attribute generator inorder to create your 
+own attribute. This is simply done by modifying the portnumber.c file 
+locate under /attributegenerator/src/
+
+Collect Your own Traffic Flows
+------------------------------
+
+Simply open a terminal and log in as root. You then specifiy the following 
+command:
+
+
+tcpdump -w flowdump -i eth0
+
+where:
+
+The tcpdump utility will write all the flows to a file called flowdump 
+which have been viewd via interface eth0.
+
+You can this created tcpdump file in order to create the output arff file 
+required for the ANTc program.
+
+For more information on tcpdump please refer to you reference guide or online.

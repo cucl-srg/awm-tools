@@ -1,0 +1,57 @@
+HOWTO_CREATE_YOUR_OWN_ATTRIBUTES
+-----------------------------
+
+In order to create your own attributes you need to implement a shared library with
+the following methods (./include/attributecalculator.h:
+
+	- double * calculateattributes(struct netflowrecord * details, 
+				       struct packetlinkedlist * startpacket, 
+				       int * size);
+	This method is called everytime the flow demultiplexer decides that a 
+	flow has ended. 
+
+	The parameters are:
+	A netflowrecord with various details about the flow such as IP addresses, 
+	port numbers and size.
+	A packetlinkedlist which is a linkedlist containing all the packets in the
+	trace.
+	A pointer to an int which should be set to the number of attributes that
+	your new attribute set is going to contain.
+		- portnumber.c returns 2, source port and destination port
+
+	- void setupattributecalculator();
+        Called once when the rest of the modules are being set up
+	If there is a ARFF_OUTPUT file then this can be used to initialise the
+	file, by adding a header containing the attribute information
+
+	An example of this can be seen in:/attributegenerator/src/portnumber.c
+	where all of the methods have been implemented.
+
+
+The Makefile then needs to be adjusted to use your new library. A typical entry
+would contain:
+
+newattribset:     packetgiver
+        gcc -I./include/ -o ./lib/libmyAttributeSet.so ./src/myAttributeSet.c
+						-shared -export-dynamic
+
+        gcc -ggdb -I./include/ -L./lib/ -o ./bin/myAttributeSet 
+		./src/packetgivercmd.c -lpacketgiver -lpcap -lmyAttributeSet -lm
+
+This make command consists of three parts:
+
+	Call the packetgiver command
+	----------------------------
+	Build the packetgiver module, this is the demultiplexer library
+
+	Compile our new attribute set
+	-----------------------------
+	We compile our new attribute set as a shared library
+
+	Compile the new program as myAttributeSet
+	-----------------------------------------
+	We then compile the whole program (including the driver program called
+	packetgivercmd)
+
+
+

@@ -1,0 +1,39 @@
+INSTALL INSTRUCTIONS FOR ANTc
+
+        Download WEKA (Data Mining Tool)
+        --------------------------------
+        - http://www.cs.waikato.ac.nz/ml/weka/
+
+        Simply extract this file and then you have access
+        to the weka.jar bundle
+
+        Compile attributegenerator application
+        --------------------------------------
+
+        - cd ./attributegenerator/
+        - make
+	- Please ignore the warnings for now (14th August 2006)
+	  they are needed or the hash table breaks (sorry awm)
+
+        This will result in two (currently) different applications
+        being compiled:
+                - attributegenerator/bin/awmreduced
+                - attributegenerator/bin/portnumber
+        These two applications can be run to produce attribute files for
+        both Andrew Moore's reduced set of 11 attributes (Moore, 2005) and
+        a simple source port and destination port attribute file (to serve as
+        an example of how to create your own attributes). See the man pages
+	inside the docs directory for more information on these data sets.
+
+        - See ./docs/HOWTO_GENERATE_ATTRIBUTES for information on how to
+	generate your own attribute sets.
+
+        Get some test data
+        ------------------
+        Use your favourite packet capturing tool to capture some network data.
+        This data will serve as your training set so preferably this needs to
+        be traffic from a variety of different applications.
+
+        - e.g. Use your web browser, send an email, download something off FTP
+
+	- e.g. tcpdump -i eth0 -w mydata.tcpdump -nn -t 

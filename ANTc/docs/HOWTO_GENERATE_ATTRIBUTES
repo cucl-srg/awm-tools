@@ -1,0 +1,32 @@
+HOWTO_GENERATE_ATTRIBUTES
+-------------------------
+
+Using the attributegenerator software you can easily generate a set of attributes
+for any network data (TCP/IP only i'm afraid at the moment).
+
+Simply run this command:
+
+./attributegenerator/bin/awmreduced *.tcpdump -a myOutput.arff
+
+The *.tcpdump indicates that you can use wildcards in the command line. Having
+learnt that UNIX imposes file size limitations, it is best splitting your network
+data into several small files.
+
+The -a option makes the program output any attribute data to the specified file
+
+The program used in this example is awmreduced, this is an attribute generator for
+Andrew Moore's reduced set of attributes (Moore, 2005). There is another program
+included in this distribtion (portnumber) which only output's port information
+for each flow detected in the input data.
+
+See HOWTO_GENERATE_YOUR_OWN_ATTRIBUTES to learn how to create a different program.
+
+There are some other command line options that can be used with the attribute
+generation programs:
+
+	-p <number> 
+		- generate attributes for flows after sniffing a certain number
+		  of packets
+	-d <duration>
+		- generate attributes for flows after a flow reaches a certain
+		  duration (MUST FIND OUT THE RESOLUTION OF THE DURATION)
