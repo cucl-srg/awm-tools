@@ -238,7 +238,7 @@ FD_FFS(int start, int maxfd, fd_set *fd)
 	if(x == 0) 
 	    continue;  /* nothing set here */
 
-	j = ffs_long((u_int32_t)x) - 1 + i*__NFDBITS;
+	j = ffsl(x) - 1 + i*__NFDBITS;
 
 	if(j > maxfd) 
 	    return 0;
@@ -262,7 +262,7 @@ FD_FFSandC(int start, int maxfd, fd_set * fd)
 	if(x == 0)
 	    continue;  /* nothing set here */
 
-	j = ffs_long((u_int32_t) x) - 1 + i*__NFDBITS;
+	j = ffsl(x) - 1 + i*__NFDBITS;
 
 	if(j > maxfd) 
 	    return 0;
