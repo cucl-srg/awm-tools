@@ -42,6 +42,7 @@
 #include "trident_util.h"
 #include "surge_clt.h"
 
+#undef DEBUG_DISTN
 static int     G_os;
 
 #define interpage_distn(a)  (a)->interpage.function(&(a)->interpage)
