@@ -51,10 +51,10 @@ libtrident.a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 
 trident:libtrident.a $(STANDALONE_OBJS)
-	$(CC) $(LDFLAGS) -o bin/$@ $(STANDALONE_OBJS) -L. -ltrident 
+	$(CC) -o bin/$@ $(STANDALONE_OBJS) -L. -ltrident $(LDFLAGS)
 
 THtrident:libtrident.a $(THREADTEST_OBJS)
-	$(CC) $(LDFLAGS) -o bin/$@ $(THREADTEST_OBJS) -L. -ltrident -lpthread
+	$(CC) -o bin/$@ $(THREADTEST_OBJS) -L. -ltrident -lpthread $(LDFLAGS)
 
 depend::
 	@[ -f Dmakefile ] || touch Dmakefile

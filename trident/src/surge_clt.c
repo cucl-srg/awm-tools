@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <errno.h>
+#include <limits.h>
 #include <math.h>
 #include <string.h>
 #include <unistd.h>
@@ -41,6 +42,7 @@
 #include "trident_util.h"
 #include "surge_clt.h"
 
+#undef DEBUG_DISTN
 static int     G_os;
 
 #define interpage_distn(a)  (a)->interpage.function(&(a)->interpage)
@@ -262,7 +264,7 @@ surge_client(int n, char *host, int num_ports, int base_rx_port, stats *stats,
 	    stats->ttime_usec += (double)(tdiff.tv_sec*1.e6 + tdiff.tv_usec);
 	    
 
-	    if(1) {
+	    if(verbose) {
 		fprintf(stderr,
 			"%d.%06d Finished with %d after %d bytes. "
 			"%ld.%03lds = %.4f Mb/s.\n", 
